@@ -4,6 +4,7 @@ import { Plus, Users, User, Settings, Maximize2, Edit2, Trash2, Book, ChevronDow
 import { cn } from '../lib/utils';
 import { CharacterDialog } from './CharacterDialog';
 import { WorldbookDialog } from './WorldbookDialog';
+import { WorldbookPanel } from './WorldbookPanel';
 import { GroupDialog } from './GroupDialog';
 
 interface SidebarProps {
@@ -29,6 +30,8 @@ export function Sidebar({ onSelectChat, currentChat, onOpenSettings }: SidebarPr
   
   const [isWorldbookDialogOpen, setIsWorldbookDialogOpen] = useState(false);
   const [editingWorldbook, setEditingWorldbook] = useState<Worldbook | undefined>(undefined);
+  
+  const [isWorldbookPanelOpen, setIsWorldbookPanelOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -249,16 +252,25 @@ export function Sidebar({ onSelectChat, currentChat, onOpenSettings }: SidebarPr
                 Worldbook ({worldbooks.length})
               </h3>
             </button>
-            <button 
-              onClick={() => {
-                setEditingWorldbook(undefined);
-                setIsWorldbookDialogOpen(true);
-              }}
-              className="text-gray-400 hover:text-purple-600"
-              title="Add Entry"
-            >
-              <Plus size={14} />
-            </button>
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setIsWorldbookPanelOpen(true)}
+                className="text-gray-400 hover:text-purple-600"
+                title="Worldbook Settings"
+              >
+                <Settings size={14} />
+              </button>
+              <button 
+                onClick={() => {
+                  setEditingWorldbook(undefined);
+                  setIsWorldbookDialogOpen(true);
+                }}
+                className="text-gray-400 hover:text-purple-600"
+                title="Add Entry"
+              >
+                <Plus size={14} />
+              </button>
+            </div>
           </div>
           {!isWorldbookCollapsed && (
             <div className="max-h-48 overflow-y-auto space-y-1">
@@ -331,7 +343,7 @@ export function Sidebar({ onSelectChat, currentChat, onOpenSettings }: SidebarPr
             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
               <Settings size={16} />
             </div>
-            <span className="font-medium">World Settings</span>
+            <span className="font-medium">System Settings</span>
           </button>
         </div>
       </div>
@@ -355,6 +367,11 @@ export function Sidebar({ onSelectChat, currentChat, onOpenSettings }: SidebarPr
         onClose={() => setIsWorldbookDialogOpen(false)}
         onSave={loadData}
         initialData={editingWorldbook}
+      />
+
+      <WorldbookPanel
+        isOpen={isWorldbookPanelOpen}
+        onClose={() => setIsWorldbookPanelOpen(false)}
       />
     </div>
   );

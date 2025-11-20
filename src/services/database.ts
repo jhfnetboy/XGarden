@@ -45,6 +45,23 @@ export interface Config {
   model: string;
 }
 
+export interface Chapter {
+  id?: number;
+  order: number;
+  title: string;
+  description: string;
+  backgroundImage?: string;
+  backgroundMusic?: string;
+  isActive: boolean;
+  isCompleted: boolean;
+  triggerType: 'time' | 'keyword' | 'ai-judgment';
+  triggerCondition?: {
+    dialogueCount?: number;
+    timeMinutes?: number;
+    keywords?: string[];
+  };
+}
+
 interface XGardenDB extends DBSchema {
   characters: {
     key: number;
@@ -67,6 +84,10 @@ interface XGardenDB extends DBSchema {
   config: {
     key: string;
     value: any;
+  };
+  chapters: {
+    key: number;
+    value: Chapter;
   };
   plugin_configs: {
     key: string;
@@ -97,8 +118,8 @@ export class DatabaseService {
 
   async connect(worldName: string): Promise<boolean> {
     try {
-      this.db = await openDB<XGardenDB>(`${DB_PREFIX}${worldName}`, 1, {
-        upgrade(db) {
+      this.db = await openDB<XGardenDB>(`${DB_PREFIX}${worldName}`, 2, {
+        upgrade: (db) => {
           // Characters store
           if (!db.objectStoreNames.contains('characters')) {
             const charStore = db.createObjectStore('characters', { keyPath: 'id', autoIncrement: true });
@@ -124,6 +145,11 @@ export class DatabaseService {
           // Config store
           if (!db.objectStoreNames.contains('config')) {
             db.createObjectStore('config');
+          }
+          
+          // Chapters store (added in version 2)
+          if (!db.objectStoreNames.contains('chapters')) {
+            db.createObjectStore('chapters', { keyPath: 'id', autoIncrement: true });
           }
           
           // Plugin configs store
@@ -286,6 +312,62 @@ export class DatabaseService {
   async saveWorldDescription(description: string): Promise<void> {
     await this.ensureConnection();
     await this.db!.put('config', description, 'worldDescription');
+  }
+
+  // Chapter Operations
+  async getAllChapters(): Promise<Chapter[]> {
+    await this.ensureConnection();
+    return this.db!.getAll('chapters');
+  }
+
+  async saveChapter(chapter: Chapter): Promise<number> {
+    await this.ensureConnection();
+    // If saving a new active chapter, deactivate all others
+    if (chapter.isActive) {
+      const allChapters = await this.getAllChapters();
+      for (const ch of allChapters) {
+        if (ch.id !== chapter.id && ch.isActive) {
+          ch.isActive = false;
+          await this.db!.put('chapters', ch);
+        }
+      }
+    }
+    return this.db!.put('chapters', chapter);
+  }
+
+  async deleteChapter(id: number): Promise<void> {
+    await this.ensureConnection();
+    await this.db!.delete('chapters', id);
+  }
+
+  async getActiveChapter(): Promise<Chapter | null> {
+    await this.ensureConnection();
+    const chapters = await this.getAllChapters();
+    return chapters.find(ch => ch.isActive) || null;
+  }
+
+  async advanceToNextChapter(): Promise<Chapter | null> {
+    await this.ensureConnection();
+    const chapters = await this.getAllChapters();
+    chapters.sort((a, b) => a.order - b.order);
+    
+    const activeChapter = chapters.find(ch => ch.isActive);
+    if (!activeChapter) return null;
+    
+    // Mark current as completed
+    activeChapter.isActive = false;
+    activeChapter.isCompleted = true;
+    await this.db!.put('chapters', activeChapter);
+    
+    // Find next chapter
+    const nextChapter = chapters.find(ch => ch.order > activeChapter.order && !ch.isCompleted);
+    if (nextChapter) {
+      nextChapter.isActive = true;
+      await this.db!.put('chapters', nextChapter);
+      return nextChapter;
+    }
+    
+    return null;
   }
 
   // Export/Import

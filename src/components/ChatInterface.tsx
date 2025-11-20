@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { dbService, Message, Character } from '../services/database';
+import { dbService, Message, Character, Chapter } from '../services/database';
 import { globalConfigService } from '../services/globalConfig';
 import { aiService } from '../services/ai';
 import { Sidebar } from './Sidebar';
@@ -11,13 +11,14 @@ import { cn } from '../lib/utils';
 
 export function ChatInterface() {
   const navigate = useNavigate();
-  const [currentChat, setCurrentChat] = useState<{ id: number | null; type: 'private' | 'group' | '' }>({ id: null, type: '' });
+  const [currentChat, setCurrentChat] = useState<{ id: number | null; type: 'private' | 'group' }>({ id: null, type: 'private' });
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const [participants, setParticipants] = useState<Character[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,6 +40,91 @@ export function ChatInterface() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    loadActiveChapter();
+  }, []);
+
+  async function loadActiveChapter() {
+    const chapter = await dbService.getActiveChapter();
+    setActiveChapter(chapter);
+    
+    // If no active chapter, use default background
+    if (!chapter) {
+      // Use a default background
+      const defaultBackground = {
+        backgroundImage: 'assets/default-background.png',
+        backgroundMusic: getRandomMusic()
+      };
+      // Store as a pseudo-chapter for display purposes
+      setActiveChapter({
+        id: -1,
+        order: 0,
+        title: 'Default',
+        description: '',
+        backgroundImage: defaultBackground.backgroundImage,
+        backgroundMusic: defaultBackground.backgroundMusic,
+        isActive: false,
+        isCompleted: false,
+        triggerType: 'time'
+      } as Chapter);
+    }
+  }
+
+  function getRandomMusic(): string {
+    const musicOptions = [
+      'peaceful-forest',
+      'calm-piano',
+      'ambient-space',
+      'medieval-lute',
+      'gentle-rain'
+    ];
+    return musicOptions[Math.floor(Math.random() * musicOptions.length)];
+  }
+
+  async function checkChapterProgression(lastMessage: Message) {
+    if (!activeChapter || activeChapter.isCompleted) return;
+
+    let shouldAdvance = false;
+
+    // Check trigger conditions
+    if (activeChapter.triggerType === 'time') {
+      // Time-based: check dialogue count
+      const dialogueCount = activeChapter.triggerCondition?.dialogueCount || 10;
+      if (messages.length + 1 >= dialogueCount) {
+        shouldAdvance = true;
+      }
+    } else if (activeChapter.triggerType === 'keyword') {
+      // Keyword-based: check if any keyword appears in the message
+      const keywords = activeChapter.triggerCondition?.keywords || [];
+      const messageText = lastMessage.content.toLowerCase();
+      shouldAdvance = keywords.some(keyword => 
+        messageText.includes(keyword.toLowerCase())
+      );
+    } else if (activeChapter.triggerType === 'ai-judgment') {
+      // AI-judgment: ask AI if chapter should advance
+      // For now, we'll implement a simple check - can be enhanced later
+      // This would require an additional AI call to determine if story has progressed enough
+      shouldAdvance = false; // TODO: Implement AI judgment
+    }
+
+    if (shouldAdvance) {
+      const nextChapter = await dbService.advanceToNextChapter();
+      if (nextChapter) {
+        setActiveChapter(nextChapter);
+        // Show notification to user
+        const notificationMsg: Message = {
+          role: 'char',
+          content: `📖 **章节推进**: ${nextChapter.title}\n\n${nextChapter.description}`,
+          timestamp: Date.now(),
+          sessionId: `${currentChat.type}_${currentChat.id}`,
+          characterName: '系统'
+        };
+        await dbService.saveMessage(notificationMsg);
+        setMessages(prev => [...prev, notificationMsg]);
+      }
+    }
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -142,6 +228,9 @@ export function ChatInterface() {
 
       await dbService.saveMessage(aiMsg);
       setMessages(prev => [...prev, aiMsg]);
+      
+      // Check if chapter should progress
+      await checkChapterProgression(aiMsg);
     } catch (error) {
       console.error('Failed to send message:', error);
       const errorMsg: Message = {
@@ -165,7 +254,22 @@ export function ChatInterface() {
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      <div className="flex-1 flex flex-col h-full min-h-0">
+      <div 
+        className="flex-1 flex flex-col h-full min-h-0 relative"
+        style={{
+          backgroundImage: activeChapter?.backgroundImage ? `url(${activeChapter.backgroundImage})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Overlay for readability */}
+        {activeChapter?.backgroundImage && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+        )}
+
+        {/* Content */}
+        <div className="relative z-10 flex-1 flex flex-col h-full min-h-0">
         {/* Chat Header */}
         <div className="h-14 border-b border-gray-200 flex items-center px-4 justify-between bg-white">
           <div className="flex items-center gap-3">
@@ -268,8 +372,15 @@ export function ChatInterface() {
             </button>
           </div>
         </div>
+        {/* End of relative z-10 content */}
       </div>
-      <SettingsDialog isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      {/* End of background image container */}
+      </div>
+
+      <SettingsDialog 
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </div>
   );
 }

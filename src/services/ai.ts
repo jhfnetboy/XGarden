@@ -165,10 +165,13 @@ Make the conversation feel natural - characters can agree, disagree, ask questio
       }
     }
 
-    prompt += `\n[严格规则：玩家角色的发言包含过去式词汇（如：以前、上次、当初、想想、记得、想当初、还记得吗、之前）或 推测性提示词（如：你想想、是不是说过、应该提过），必须调用"chatHistory"工具搜索历史记录；`;
+    prompt += `\n[严格规则：
+1. 玩家角色的发言包含过去式词汇（如：以前、上次、当初、想想、记得、想当初、还记得吗、之前）或推测性提示词（如：你想想、是不是说过、应该提过），必须调用"chatHistory"工具搜索历史记录；
+2. **重要：使用第三人称叙述，必须使用角色名称而不是"我"。例如："教练的目光紧盯着..."而不是"我的目光紧盯着..."。每个角色的行为和想法都应该用该角色的名字来描述。**
+3. 旁白描述场景时可以不带角色名前缀，但涉及具体角色的行为、想法、感受时，必须明确使用角色名。`;
     
     if (hasPlayerCharacter) {
-      prompt += `玩家角色是 ${playerCharacter!.name}，AI绝不能代替此角色说话或行动。剧情只能根据 ${playerCharacter!.name} 的对话来推进。如果没有说明角色应该互相不认识，应该随着角色之间的对话来缓慢推进剧情。`;
+      prompt += `\n4. 玩家角色是 ${playerCharacter!.name}，AI绝不能代替此角色说话或行动。剧情只能根据 ${playerCharacter!.name} 的对话来推进。如果没有说明角色应该互相不认识，应该随着角色之间的对话来缓慢推进剧情。`;
     }
     
     prompt += roleplayInstruction + "]";

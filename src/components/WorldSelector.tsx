@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dbService } from '../services/database';
-import { Maximize2 } from 'lucide-react';
+import { Maximize2, Upload } from 'lucide-react';
 
 export function WorldSelector() {
   const navigate = useNavigate();
@@ -29,63 +29,95 @@ export function WorldSelector() {
     await handleEnterWorld(newWorldName);
   }
 
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+        
+        // Use filename as default world name if not present
+        const worldName = data.worldName || file.name.replace('.json', '');
+        
+        const success = await dbService.importWorld(data, worldName);
+        if (success) {
+          loadWorlds();
+        } else {
+          alert('Failed to import world');
+        }
+      } catch (error) {
+        console.error('Import error:', error);
+        alert('Invalid world file');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
-    <div className="relative flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-900 to-purple-900 text-white p-8">
+    <div className="relative flex flex-col items-center justify-center h-full bg-gradient-to-br from-sky-200 to-blue-300 text-gray-800 p-8">
       <button 
         onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL("index.html") })}
-        className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition-colors"
         title="Open in new tab"
       >
         <Maximize2 size={24} />
       </button>
 
       <div className="mb-8 text-center">
-        <img src="assets/icon.png" alt="Logo" className="w-24 h-24 mx-auto mb-4" />
-        <h1 className="text-4xl font-bold mb-2">XGarden</h1>
-        <p className="text-white/70">Choose your reality</p>
+        <img src="assets/icon.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 drop-shadow-lg" />
+        <h1 className="text-4xl font-bold mb-2 text-gray-900">XGarden</h1>
+        <p className="text-gray-700">Choose your reality</p>
       </div>
 
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span>🌍</span> Select World
-          </h2>
-          <div className="space-y-2">
-            {worlds.map(world => (
-              <button
-                key={world}
-                onClick={() => handleEnterWorld(world)}
-                className="w-full text-left px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex justify-between items-center"
-              >
-                <span>{world}</span>
-                <span className="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded">Ready</span>
-              </button>
-            ))}
-            {worlds.length === 0 && (
-              <p className="text-center text-white/50 py-4">No worlds found. Create one below.</p>
-            )}
-          </div>
+      <div className="w-full max-w-xs space-y-4">
+        <div className="space-y-2">
+          {worlds.map(world => (
+            <button
+              key={world}
+              onClick={() => handleEnterWorld(world)}
+              className="w-full p-4 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all font-medium text-left flex justify-between items-center group"
+            >
+              <span>{world}</span>
+              <span className="opacity-0 group-hover:opacity-100 text-purple-500">→</span>
+            </button>
+          ))}
         </div>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span>✨</span> Create World
-          </h2>
+        <div className="pt-4 border-t border-gray-400/30">
           <div className="flex gap-2">
-            <input
-              type="text"
-              value={newWorldName}
-              onChange={(e) => setNewWorldName(e.target.value)}
-              placeholder="Enter world name..."
-              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2 focus:outline-none focus:border-purple-400"
-            />
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={newWorldName}
+                onChange={(e) => setNewWorldName(e.target.value)}
+                placeholder="New World Name"
+                className="w-full px-4 py-3 rounded-xl border-none focus:ring-2 focus:ring-purple-500 bg-white/80 backdrop-blur-sm"
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateWorld()}
+              />
+            </div>
             <button
               onClick={handleCreateWorld}
               disabled={!newWorldName.trim()}
-              className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg font-medium transition-colors"
+              className="px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-purple-500/30"
             >
               Create
             </button>
+          </div>
+          
+          <div className="mt-4 flex justify-center">
+            <label className="flex items-center gap-2 text-gray-700 hover:text-gray-900 cursor-pointer px-4 py-2 rounded-lg hover:bg-white/50 transition-colors">
+              <Upload size={18} />
+              <span className="text-sm font-medium">Import World JSON</span>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                className="hidden"
+              />
+            </label>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-# CryptoGameFrameWork
+# XGarden
 Yeah, it is yet another(?) crypto game framework, that service for the Arcadia: Infinity Garden
 
 ## Motivation
@@ -20,6 +20,7 @@ This repo can help you to get a Crypto engine maybe.
 ## Basic Idea
 What is the most interesting game?
 Chill
+AI
 Easy
 Story
 Interaction
@@ -28,10 +29,8 @@ Tales
 Real Mirror World
 PNTs
 Mobile version
-----
-https://github.com/flutter/games/tree/main/templates/basic
+
 
 ## Architecture
 
 
-## 

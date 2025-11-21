@@ -114,8 +114,8 @@ export function WorldSelector() {
         <Maximize2 size={24} />
       </button>
 
-      <div className="mb-8 text-center">
-        <img src="assets/icon.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 mt-7 pt-1 drop-shadow-lg" />
+      <div className="mb-3 text-center">
+        <img src="assets/icon.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 mt-8 pt-0.5 drop-shadow-lg" />
         <h1 className="text-4xl font-bold mb-2 text-gray-900">XGarden</h1>
         <p className="text-gray-700">Choose your reality</p>
       </div>

@@ -55,11 +55,15 @@ export function Sidebar({ onSelectChat, currentChat, onOpenSettings }: SidebarPr
           <p className="text-xs text-gray-500">Connected to: {dbService['currentWorldName']}</p>
         </div>
         <button 
-          onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL("index.html") })}
+          onClick={() => {
+            const worldName = dbService['currentWorldName'];
+            const url = chrome.runtime.getURL(`index.html#/chat?world=${encodeURIComponent(worldName)}`);
+            chrome.tabs.create({ url });
+          }}
           className="text-gray-400 hover:text-gray-600 transition-colors"
           title="Open in new tab"
         >
-          <Maximize2 size={18} />
+          <Maximize2 size={20} />
         </button>
       </div>
 

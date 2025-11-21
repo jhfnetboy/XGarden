@@ -47,23 +47,22 @@ export function ChatInterface() {
 
   async function loadActiveChapter() {
     const chapter = await dbService.getActiveChapter();
-    setActiveChapter(chapter);
     
-    // If no active chapter, use default background
-    if (!chapter) {
-      // Use a default background
-      const defaultBackground = {
-        backgroundImage: 'assets/default-background.png',
-        backgroundMusic: getRandomMusic()
-      };
-      // Store as a pseudo-chapter for display purposes
+    if (chapter) {
+      setActiveChapter(chapter);
+      console.log('Loaded active chapter:', chapter);
+    } else {
+      // No active chapter - use default background
+      console.log('No active chapter, using default background');
+      const defaultBgUrl = chrome.runtime.getURL('assets/default-background.png');
+      console.log('Default background URL:', defaultBgUrl);
       setActiveChapter({
         id: -1,
         order: 0,
         title: 'Default',
         description: '',
-        backgroundImage: defaultBackground.backgroundImage,
-        backgroundMusic: defaultBackground.backgroundMusic,
+        backgroundImage: defaultBgUrl,
+        backgroundMusic: getRandomMusic(),
         isActive: false,
         isCompleted: false,
         triggerType: 'time'
@@ -83,9 +82,24 @@ export function ChatInterface() {
   }
 
   async function checkChapterProgression(lastMessage: Message) {
-    if (!activeChapter || activeChapter.isCompleted) return;
+    if (!activeChapter || activeChapter.isCompleted) {
+      console.log('Chapter progression check skipped:', { activeChapter, isCompleted: activeChapter?.isCompleted });
+      return;
+    }
+
+    // Skip check for pseudo default chapter
+    if (activeChapter.id === -1) {
+      console.log('Skipping progression check for default chapter');
+      return;
+    }
 
     let shouldAdvance = false;
+
+    console.log('Checking chapter progression:', {
+      triggerType: activeChapter.triggerType,
+      triggerCondition: activeChapter.triggerCondition,
+      messageContent: lastMessage.content
+    });
 
     // Check trigger conditions
     if (activeChapter.triggerType === 'time') {
@@ -93,14 +107,23 @@ export function ChatInterface() {
       const dialogueCount = activeChapter.triggerCondition?.dialogueCount || 10;
       if (messages.length + 1 >= dialogueCount) {
         shouldAdvance = true;
+        console.log('Time trigger activated:', { currentCount: messages.length + 1, required: dialogueCount });
       }
     } else if (activeChapter.triggerType === 'keyword') {
       // Keyword-based: check if any keyword appears in the message
       const keywords = activeChapter.triggerCondition?.keywords || [];
       const messageText = lastMessage.content.toLowerCase();
-      shouldAdvance = keywords.some(keyword => 
-        messageText.includes(keyword.toLowerCase())
-      );
+      console.log('Checking keywords:', { keywords, messageText });
+      
+      shouldAdvance = keywords.some(keyword => {
+        const found = messageText.includes(keyword.toLowerCase());
+        console.log(`Keyword "${keyword}" found:`, found);
+        return found;
+      });
+      
+      if (shouldAdvance) {
+        console.log('Keyword trigger activated!');
+      }
     } else if (activeChapter.triggerType === 'ai-judgment') {
       // AI-judgment: ask AI if chapter should advance
       // For now, we'll implement a simple check - can be enhanced later
@@ -109,6 +132,7 @@ export function ChatInterface() {
     }
 
     if (shouldAdvance) {
+      console.log('Advancing to next chapter...');
       const nextChapter = await dbService.advanceToNextChapter();
       if (nextChapter) {
         setActiveChapter(nextChapter);
@@ -122,6 +146,9 @@ export function ChatInterface() {
         };
         await dbService.saveMessage(notificationMsg);
         setMessages(prev => [...prev, notificationMsg]);
+        console.log('Chapter advanced to:', nextChapter.title);
+      } else {
+        console.log('No next chapter available');
       }
     }
   }
@@ -261,6 +288,14 @@ export function ChatInterface() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
+        }}
+        ref={(el) => {
+          if (el && activeChapter?.backgroundImage) {
+            console.log('Background div style:', {
+              backgroundImage: el.style.backgroundImage,
+              computedStyle: window.getComputedStyle(el).backgroundImage
+            });
+          }
         }}
       >
         {/* Overlay for readability */}

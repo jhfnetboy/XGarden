@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { dbService, Worldbook, Chapter } from '../services/database';
-import { X, Plus, Edit2, Trash2, Play, Book, FileText } from 'lucide-react';
+import { X, Plus, Edit2, Trash2, Play, Book, FileText, Upload } from 'lucide-react';
 import { WorldbookDialog } from './WorldbookDialog';
 import { ChapterDialog } from './ChapterDialog';
 
@@ -12,6 +12,8 @@ interface WorldbookPanelProps {
 export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
   const [activeTab, setActiveTab] = useState<'entries' | 'chapters'>('entries');
   const [worldDescription, setWorldDescription] = useState('');
+  const [worldDefaultBg, setWorldDefaultBg] = useState('');
+  const [worldDefaultMusic, setWorldDefaultMusic] = useState('');
   
   // Entries state
   const [worldbooks, setWorldbooks] = useState<Worldbook[]>([]);
@@ -26,6 +28,7 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
   useEffect(() => {
     if (isOpen) {
       loadDescription();
+      loadWorldDefaults();
       loadWorldbooks();
       loadChapters();
     }
@@ -34,6 +37,12 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
   async function loadDescription() {
     const desc = await dbService.getWorldDescription();
     setWorldDescription(desc);
+  }
+
+  async function loadWorldDefaults() {
+    const defaults = await dbService.getWorldDefaults();
+    setWorldDefaultBg(defaults.backgroundImage || '');
+    setWorldDefaultMusic(defaults.backgroundMusic || '');
   }
 
   async function loadWorldbooks() {
@@ -51,10 +60,28 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
     await dbService.saveWorldDescription(worldDescription);
   }
 
+  async function handleSaveWorldDefaults() {
+    await dbService.saveWorldDefaults({
+      backgroundImage: worldDefaultBg,
+      backgroundMusic: worldDefaultMusic
+    });
+  }
+
   async function handleSetActive(chapter: Chapter) {
     await dbService.saveChapter({ ...chapter, isActive: true });
     loadChapters();
   }
+
+  const handleBgImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setWorldDefaultBg(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -109,13 +136,66 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
                   value={worldDescription}
                   onChange={(e) => setWorldDescription(e.target.value)}
                   onBlur={handleSaveDescription}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-purple-500 h-32 resize-none text-sm"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-purple-500 h-24 resize-none text-sm"
                   placeholder="Describe the world setting, background, theme..."
                 />
               </div>
 
+              {/* World Defaults */}
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">World Defaults</h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Default Background Image</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={worldDefaultBg}
+                        onChange={(e) => setWorldDefaultBg(e.target.value)}
+                        onBlur={handleSaveWorldDefaults}
+                        className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-purple-500"
+                        placeholder="Image URL or upload..."
+                      />
+                      <label className="px-3 py-1.5 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 cursor-pointer flex items-center gap-1">
+                        <Upload size={14} />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleBgImageUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                    {worldDefaultBg && (
+                      <img src={worldDefaultBg} alt="Preview" className="mt-2 w-full h-20 object-cover rounded-lg" />
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Default Background Music</label>
+                    <select
+                      value={worldDefaultMusic}
+                      onChange={(e) => {
+                        setWorldDefaultMusic(e.target.value);
+                        handleSaveWorldDefaults();
+                      }}
+                      className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-purple-500"
+                    >
+                      <option value="">None</option>
+                      <option value="peaceful-forest">Peaceful Forest</option>
+                      <option value="calm-piano">Calm Piano</option>
+                      <option value="ambient-space">Ambient Space</option>
+                      <option value="medieval-lute">Medieval Lute</option>
+                      <option value="gentle-rain">Gentle Rain</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">Used when no chapter is active</p>
+                  </div>
+                </div>
+              </div>
+
               {/* Entries List */}
-              <div>
+              <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="text-sm font-semibold text-gray-700">Keyword Entries</h3>
                   <button

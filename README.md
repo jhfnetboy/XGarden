@@ -34,3 +34,6 @@ Mobile version
 ## Architecture
 
 
+### AI
+1. Set AI with Gemini （Google AI Studio）
+2. Set Image Generation AI API with Jimeng：https://console.volcengine.com/ai/ability/detail/2

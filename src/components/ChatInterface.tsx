@@ -19,7 +19,9 @@ export function ChatInterface() {
   const [participants, setParticipants] = useState<Character[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
+  const [worldDefaults, setWorldDefaults] = useState<{ backgroundImage?: string; backgroundMusic?: string }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (currentChat.id && currentChat.type) {
@@ -43,7 +45,12 @@ export function ChatInterface() {
 
   useEffect(() => {
     loadActiveChapter();
+    loadWorldDefaults();
   }, []);
+
+  useEffect(() => {
+    playBackgroundMusic();
+  }, [activeChapter, worldDefaults]);
 
   async function loadActiveChapter() {
     const chapter = await dbService.getActiveChapter();
@@ -52,33 +59,68 @@ export function ChatInterface() {
       setActiveChapter(chapter);
       console.log('Loaded active chapter:', chapter);
     } else {
-      // No active chapter - use default background
-      console.log('No active chapter, using default background');
-      const defaultBgUrl = chrome.runtime.getURL('assets/default-background.png');
-      console.log('Default background URL:', defaultBgUrl);
-      setActiveChapter({
-        id: -1,
-        order: 0,
-        title: 'Default',
-        description: '',
-        backgroundImage: defaultBgUrl,
-        backgroundMusic: getRandomMusic(),
-        isActive: false,
-        isCompleted: false,
-        triggerType: 'time'
-      } as Chapter);
+      // No active chapter - will use world defaults
+      console.log('No active chapter, will use world defaults');
+      setActiveChapter(null);
     }
   }
 
-  function getRandomMusic(): string {
-    const musicOptions = [
-      'peaceful-forest',
-      'calm-piano',
-      'ambient-space',
-      'medieval-lute',
-      'gentle-rain'
-    ];
-    return musicOptions[Math.floor(Math.random() * musicOptions.length)];
+  async function loadWorldDefaults() {
+    const defaults = await dbService.getWorldDefaults();
+    console.log('Loaded world defaults:', defaults);
+    setWorldDefaults(defaults);
+  }
+
+  function getMusicUrl(musicId: string): string {
+    // Option 1: Use local files (requires adding MP3 files to public/assets/music/)
+    const localMusicMap: Record<string, string> = {
+      'peaceful-forest': chrome.runtime.getURL('assets/music/peaceful-forest.mp3'),
+      'calm-piano': chrome.runtime.getURL('assets/music/calm-piano.mp3'),
+      'ambient-space': chrome.runtime.getURL('assets/music/ambient-space.mp3'),
+      'medieval-lute': chrome.runtime.getURL('assets/music/medieval-lute.mp3'),
+      'gentle-rain': chrome.runtime.getURL('assets/music/gentle-rain.mp3')
+    };
+    
+    // Option 2: Use online URLs (uncomment and replace with actual URLs)
+    // const onlineMusicMap: Record<string, string> = {
+    //   'peaceful-forest': 'https://example.com/peaceful-forest.mp3',
+    //   'calm-piano': 'https://example.com/calm-piano.mp3',
+    //   'ambient-space': 'https://example.com/ambient-space.mp3',
+    //   'medieval-lute': 'https://example.com/medieval-lute.mp3',
+    //   'gentle-rain': 'https://example.com/gentle-rain.mp3'
+    // };
+    // return onlineMusicMap[musicId] || '';
+    
+    return localMusicMap[musicId] || '';
+  }
+
+  function playBackgroundMusic() {
+    if (!audioRef.current) return;
+
+    // Priority: Active chapter music > World default music
+    const musicId = activeChapter?.backgroundMusic || worldDefaults.backgroundMusic;
+    
+    if (musicId) {
+      const musicUrl = getMusicUrl(musicId);
+      
+      if (musicUrl && audioRef.current.src !== musicUrl) {
+        audioRef.current.src = musicUrl;
+        audioRef.current.loop = true;
+        audioRef.current.volume = 0.3; // 30% volume
+        
+        // Try to play, but don't log errors if files don't exist or autoplay is blocked
+        audioRef.current.play().catch(err => {
+          // Silently handle - music is optional
+          if (err.name !== 'NotSupportedError') {
+            console.log('Background music playback info:', err.name);
+          }
+        });
+      }
+    } else {
+      // No music configured, stop playback
+      audioRef.current.pause();
+      audioRef.current.src = '';
+    }
   }
 
   async function checkChapterProgression(lastMessage: Message) {
@@ -284,22 +326,19 @@ export function ChatInterface() {
       <div 
         className="flex-1 flex flex-col h-full min-h-0 relative"
         style={{
-          backgroundImage: activeChapter?.backgroundImage ? `url(${activeChapter.backgroundImage})` : 'none',
+          backgroundImage: (activeChapter?.backgroundImage || worldDefaults.backgroundImage) 
+            ? `url(${activeChapter?.backgroundImage || worldDefaults.backgroundImage})` 
+            : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
-        ref={(el) => {
-          if (el && activeChapter?.backgroundImage) {
-            console.log('Background div style:', {
-              backgroundImage: el.style.backgroundImage,
-              computedStyle: window.getComputedStyle(el).backgroundImage
-            });
-          }
-        }}
       >
+        {/* Background Music */}
+        <audio ref={audioRef} />
+        
         {/* Overlay for readability */}
-        {activeChapter?.backgroundImage && (
+        {(activeChapter?.backgroundImage || worldDefaults.backgroundImage) && (
           <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
         )}
 

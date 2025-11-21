@@ -2,17 +2,26 @@
 // This ensures AI API config is shared across all worlds
 
 export interface GlobalConfig {
+  // AI Config
   provider: 'openai' | 'gemini';
   apiKey: string;
   apiUrl: string;
   model: string;
+  
+  // Image Generation API Config (Jimeng/Volcengine)
+  imageApiKey?: string;      // Access Key ID
+  imageApiSecret?: string;   // Secret Access Key  
+  imageApiUrl?: string;      // API endpoint
 }
 
 const DEFAULT_CONFIG: GlobalConfig = {
   provider: 'gemini',
   apiKey: '',
   apiUrl: '',
-  model: 'gemini-2.0-flash'
+  model: 'gemini-2.0-flash',
+  imageApiKey: '',
+  imageApiSecret: '',
+  imageApiUrl: 'https://visual.volcengineapi.com'
 };
 
 class GlobalConfigService {

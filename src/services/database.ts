@@ -310,8 +310,25 @@ export class DatabaseService {
   }
 
   async saveWorldDescription(description: string): Promise<void> {
-    await this.ensureConnection();
-    await this.db!.put('config', description, 'worldDescription');
+    if (!this.db) return;
+    await this.db.put('config', description, 'worldDescription');
+  }
+
+  async getWorldDefaults(): Promise<{ backgroundImage?: string; backgroundMusic?: string }> {
+    if (!this.db) return {};
+    const backgroundImage = await this.db.get('config', 'worldDefaultBackground') as string | undefined;
+    const backgroundMusic = await this.db.get('config', 'worldDefaultMusic') as string | undefined;
+    return { backgroundImage, backgroundMusic };
+  }
+
+  async saveWorldDefaults(defaults: { backgroundImage?: string; backgroundMusic?: string }): Promise<void> {
+    if (!this.db) return;
+    if (defaults.backgroundImage !== undefined) {
+      await this.db.put('config', defaults.backgroundImage, 'worldDefaultBackground');
+    }
+    if (defaults.backgroundMusic !== undefined) {
+      await this.db.put('config', defaults.backgroundMusic, 'worldDefaultMusic');
+    }
   }
 
   // Chapter Operations

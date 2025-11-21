@@ -327,23 +327,48 @@ export function ChatInterface() {
         className="flex-1 flex flex-col h-full min-h-0 relative"
         style={{
           backgroundImage: (activeChapter?.backgroundImage || worldDefaults.backgroundImage) 
-            ? `url(${activeChapter?.backgroundImage || worldDefaults.backgroundImage})` 
+            ? `url("${activeChapter?.backgroundImage || worldDefaults.backgroundImage}")` 
             : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
+        ref={(el) => {
+          if (el) {
+            const bgImage = activeChapter?.backgroundImage || worldDefaults.backgroundImage;
+            if (bgImage) {
+              console.log('Background div rendered:', {
+                hasImage: !!bgImage,
+                styleBackgroundImage: el.style.backgroundImage,
+                computedBackgroundImage: window.getComputedStyle(el).backgroundImage
+              });
+            }
+          }
+        }}
       >
         {/* Background Music */}
         <audio ref={audioRef} />
         
-        {/* Overlay for readability */}
+        {/* Debug: Log background image */}
+        {(() => {
+          const bgImage = activeChapter?.backgroundImage || worldDefaults.backgroundImage;
+          if (bgImage) {
+            console.log('Background image should be visible:', {
+              source: activeChapter?.backgroundImage ? 'chapter' : 'world default',
+              imageLength: bgImage.length,
+              imagePreview: bgImage.substring(0, 50) + '...'
+            });
+          }
+          return null;
+        })()}
+        
+        {/* Overlay for readability - reduced opacity to see background better */}
         {(activeChapter?.backgroundImage || worldDefaults.backgroundImage) && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]"></div>
         )}
 
         {/* Content */}
-        <div className="relative z-10 flex-1 flex flex-col h-full min-h-0">
+        <div className="relative flex-1 flex flex-col h-full min-h-0">
         {/* Chat Header */}
         <div className="h-14 border-b border-gray-200 flex items-center px-4 justify-between bg-white">
           <div className="flex items-center gap-3">
@@ -367,8 +392,8 @@ export function ChatInterface() {
           </div>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-4">
+        {/* Messages Area - transparent to show background */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {!currentChat.id ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400">
               <p>Select a character from the sidebar</p>
@@ -421,7 +446,8 @@ export function ChatInterface() {
         </div>
 
         {/* Input Area */}
-        <div className="p-6 bg-white border-t border-gray-200">
+        {/* Input Area - semi-transparent */}
+        <div className="p-6 bg-white/80 backdrop-blur-sm border-t border-gray-200">
           <div className="flex gap-2 items-end bg-gray-50 p-3 rounded-2xl border border-gray-200 focus-within:border-purple-400 focus-within:ring-1 focus-within:ring-purple-400 transition-all shadow-sm">
             <textarea
               value={input}

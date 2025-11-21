@@ -76,8 +76,14 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        setWorldDefaultBg(event.target?.result as string);
+      reader.onload = async (event) => {
+        const imageData = event.target?.result as string;
+        setWorldDefaultBg(imageData);
+        // Auto-save immediately after upload
+        await dbService.saveWorldDefaults({
+          backgroundImage: imageData,
+          backgroundMusic: worldDefaultMusic
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -176,9 +182,14 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
                     <label className="block text-xs font-medium text-gray-600 mb-1">Default Background Music</label>
                     <select
                       value={worldDefaultMusic}
-                      onChange={(e) => {
-                        setWorldDefaultMusic(e.target.value);
-                        handleSaveWorldDefaults();
+                      onChange={async (e) => {
+                        const newMusic = e.target.value;
+                        setWorldDefaultMusic(newMusic);
+                        // Auto-save immediately
+                        await dbService.saveWorldDefaults({
+                          backgroundImage: worldDefaultBg,
+                          backgroundMusic: newMusic
+                        });
                       }}
                       className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-purple-500"
                     >

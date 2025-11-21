@@ -16,7 +16,7 @@ export class TypewriterSound {
       if (!ctx) return;
 
       const now = ctx.currentTime;
-      const duration = 0.05; // 50ms beep
+      const duration = 0.08; // 80ms beep for better perception
 
       // Create oscillator for the "beep" sound
       const osc = ctx.createOscillator();
@@ -26,12 +26,12 @@ export class TypewriterSound {
       gain.connect(ctx.destination);
 
       // Short high-pitched beep (like keyboard typing)
-      osc.frequency.value = 800; // 800 Hz frequency
+      osc.frequency.value = 1000; // 1000 Hz frequency (higher pitch)
       osc.type = 'sine';
 
-      // Envelope: quick attack, quick decay
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+      // Envelope: quick attack, quick decay (louder)
+      gain.gain.setValueAtTime(0.3, now); // Increased from 0.1 to 0.3
+      gain.gain.exponentialRampToValueAtTime(0.05, now + duration); // Increased from 0.01
 
       osc.start(now);
       osc.stop(now + duration);

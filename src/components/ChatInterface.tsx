@@ -458,14 +458,26 @@ export function ChatInterface() {
                 {msg.characterName !== 'System' && (
                   <div
                     className="prose prose-sm max-w-none dark:prose-invert"
-                    onScroll={() => {
-                      // Play sound periodically as text is being displayed
-                      if (Math.random() < 0.1) {
-                        typewriterSound.playBeep();
-                      }
+                    onClick={() => {
+                      // Play sound when message is clicked (for testing)
+                      typewriterSound.playBeep();
                     }}
                   >
-                    <ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => {
+                          // Play a beep when paragraph is rendered (character-by-character effect)
+                          if (typeof children === 'string' && children.length > 0) {
+                            // Play sound with probability based on text length
+                            const probability = Math.min(0.3, 0.02 * children.length);
+                            if (Math.random() < probability) {
+                              setTimeout(() => typewriterSound.playBeep(), 50);
+                            }
+                          }
+                          return <p>{children}</p>;
+                        }
+                      }}
+                    >
                       {msg.content}
                     </ReactMarkdown>
                   </div>

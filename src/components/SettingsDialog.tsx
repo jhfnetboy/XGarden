@@ -201,7 +201,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Access Key ID</label>
                 <input
-                  type="text"
+                  type="password"
                   value={imageApiKey}
                   onChange={(e) => setImageApiKey(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-purple-500"

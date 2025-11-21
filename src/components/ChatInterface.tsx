@@ -6,7 +6,7 @@ import { aiService } from '../services/ai';
 import { Sidebar } from './Sidebar';
 import { SettingsDialog } from './SettingsDialog';
 import ReactMarkdown from 'react-markdown';
-import { Send, ArrowLeft, MoreVertical } from 'lucide-react';
+import { Send, ArrowLeft, MoreVertical, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export function ChatInterface() {
@@ -20,6 +20,7 @@ export function ChatInterface() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
   const [worldDefaults, setWorldDefaults] = useState<{ backgroundImage?: string; backgroundMusic?: string }>({});
+  const [isMusicPlaying, setIsMusicPlaying] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -100,7 +101,7 @@ export function ChatInterface() {
     // Priority: Active chapter music > World default music
     const musicId = activeChapter?.backgroundMusic || worldDefaults.backgroundMusic;
     
-    if (musicId) {
+    if (musicId && isMusicPlaying) {
       const musicUrl = getMusicUrl(musicId);
       
       if (musicUrl && audioRef.current.src !== musicUrl) {
@@ -117,9 +118,19 @@ export function ChatInterface() {
         });
       }
     } else {
-      // No music configured, stop playback
+      // No music configured or music paused, stop playback
       audioRef.current.pause();
-      audioRef.current.src = '';
+    }
+  }
+
+  function toggleMusic() {
+    setIsMusicPlaying(!isMusicPlaying);
+    if (!isMusicPlaying && audioRef.current) {
+      // Resume playing
+      audioRef.current.play().catch(() => {});
+    } else if (audioRef.current) {
+      // Pause
+      audioRef.current.pause();
     }
   }
 
@@ -326,9 +337,13 @@ export function ChatInterface() {
       <div 
         className="flex-1 flex flex-col h-full min-h-0 relative"
         style={{
-          backgroundImage: (activeChapter?.backgroundImage || worldDefaults.backgroundImage) 
-            ? `url("${activeChapter?.backgroundImage || worldDefaults.backgroundImage}")` 
-            : 'none',
+          backgroundImage: (() => {
+            const chapterBg = activeChapter?.backgroundImage;
+            const worldBg = worldDefaults.backgroundImage;
+            const defaultBg = chrome.runtime.getURL('assets/default-background.png');
+            const bgImage = chapterBg || worldBg || defaultBg;
+            return bgImage ? `url("${bgImage}")` : 'none';
+          })(),
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -383,6 +398,13 @@ export function ChatInterface() {
             )}
           </div>
           <div className="flex items-center gap-2">
+             <button 
+               onClick={toggleMusic}
+               className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+               title={isMusicPlaying ? 'Pause music' : 'Play music'}
+             >
+               {isMusicPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
+             </button>
              <button onClick={() => { dbService.disconnect(); navigate('/'); }} className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
                <ArrowLeft size={20} />
              </button>

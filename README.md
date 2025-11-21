@@ -305,5 +305,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Made with ❤️ by the XGarden Team**
 
 ⭐ Star us on GitHub if you find this project useful!
+❤️ Thanks and inspired by [3000World](https://github.com/34892002/3000World) repo and [SillyTavern](https://github.com/SillyTavern/SillyTavern)
 
 </div>

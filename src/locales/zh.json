@@ -1,0 +1,46 @@
+{
+  "app": {
+    "title": "幻想花园",
+    "subtitle": "选择你的现实"
+  },
+  "worldSelector": {
+    "openInNewTab": "在新标签页打开",
+    "exportWorld": "导出世界",
+    "deleteWorld": "删除世界",
+    "newWorldName": "新世界名称",
+    "create": "创建",
+    "importWorld": "导入世界JSON",
+    "loadExample": "加载示例：CypherPink"
+  },
+  "chat": {
+    "selectCharacter": "选择一个角色",
+    "exitWorld": "退出世界",
+    "pauseMusic": "暂停音乐",
+    "playMusic": "播放音乐",
+    "worldSettings": "世界设置",
+    "thinking": "正在思考..."
+  },
+  "sidebar": {
+    "characters": "角色",
+    "groups": "群组",
+    "worldbook": "世界书",
+    "addEntry": "添加条目",
+    "config": "配置",
+    "aiSettings": "AI设置"
+  },
+  "dialogs": {
+    "settings": "设置",
+    "aiConfig": "AI配置",
+    "imageApi": "图片API",
+    "provider": "提供商",
+    "apiKey": "API密钥",
+    "apiUrl": "API地址",
+    "model": "模型",
+    "accessKeyId": "访问密钥ID",
+    "secretAccessKey": "秘密访问密钥",
+    "apiEndpoint": "API端点",
+    "save": "保存",
+    "done": "完成",
+    "cancel": "取消"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "app": {
+    "title": "XGarden",
+    "subtitle": "เลือกความเป็นจริงของคุณ"
+  },
+  "worldSelector": {
+    "openInNewTab": "เปิดในแท็บใหม่",
+    "exportWorld": "ส่งออกโลก",
+    "deleteWorld": "ลบโลก",
+    "newWorldName": "ชื่อโลกใหม่",
+    "create": "สร้าง",
+    "importWorld": "นำเข้า JSON โลก",
+    "loadExample": "โหลดตัวอย่าง: CypherPink"
+  },
+  "chat": {
+    "selectCharacter": "เลือกตัวละคร",
+    "exitWorld": "ออกจากโลก",
+    "pauseMusic": "หยุดเพลง",
+    "playMusic": "เล่นเพลง",
+    "worldSettings": "การตั้งค่าโลก",
+    "thinking": "กำลังคิด..."
+  },
+  "sidebar": {
+    "characters": "ตัวละคร",
+    "groups": "กลุ่ม",
+    "worldbook": "หนังสือโลก",
+    "addEntry": "เพิ่มรายการ",
+    "config": "การกำหนดค่า",
+    "aiSettings": "การตั้งค่า AI"
+  },
+  "dialogs": {
+    "settings": "การตั้งค่า",
+    "aiConfig": "การกำหนดค่า AI",
+    "imageApi": "API รูปภาพ",
+    "provider": "ผู้ให้บริการ",
+    "apiKey": "คีย์ API",
+    "apiUrl": "URL API",
+    "model": "โมเดล",
+    "accessKeyId": "รหัสคีย์การเข้าถึง",
+    "secretAccessKey": "คีย์การเข้าถึงลับ",
+    "apiEndpoint": "จุดสิ้นสุด API",
+    "save": "บันทึก",
+    "done": "เสร็จสิ้น",
+    "cancel": "ยกเลิก"
+  }
+}

@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dbService } from '../services/database';
+import { i18nService, Language } from '../services/i18n';
 import { Maximize2, Upload, Download, Trash2, Sparkles } from 'lucide-react';
 
 export function WorldSelector() {
   const navigate = useNavigate();
   const [worlds, setWorlds] = useState<string[]>([]);
   const [newWorldName, setNewWorldName] = useState('');
+  const [language, setLanguage] = useState<Language>(i18nService.getLanguage());
+
+  const t = (key: string) => i18nService.t(key);
+
+  const handleLanguageChange = (lang: Language) => {
+    i18nService.setLanguage(lang);
+    setLanguage(lang);
+  };
 
   useEffect(() => {
     loadWorlds();
@@ -125,23 +134,40 @@ export function WorldSelector() {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-full bg-gradient-to-br from-sky-200 to-blue-300 text-gray-800 p-8">
-      <button 
-        onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL("index.html") })}
-        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition-colors"
-        title="Open in new tab"
-      >
-        <Maximize2 size={24} />
-      </button>
+    <div className="relative flex flex-col items-center justify-center w-screen h-screen bg-gradient-to-br from-sky-200 to-blue-300 text-gray-800 p-8">
+      <div className="absolute top-4 right-4 flex gap-2">
+        <div className="flex gap-1 bg-white/50 backdrop-blur-sm rounded-lg p-1">
+          {(['en', 'zh', 'th'] as Language[]).map(lang => (
+            <button
+              key={lang}
+              onClick={() => handleLanguageChange(lang)}
+              className={`px-3 py-1 rounded transition-colors text-sm font-medium ${
+                language === lang
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-700 hover:bg-white/50'
+              }`}
+            >
+              {lang.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL("index.html") })}
+          className="text-gray-600 hover:text-gray-900 transition-colors"
+          title={t('worldSelector.openInNewTab')}
+        >
+          <Maximize2 size={24} />
+        </button>
+      </div>
 
       <div className="mb-3 text-center">
         <img src="assets/icon.png" alt="Logo" className="w-24 h-24 mx-auto mb-4 mt-8 pt-0.5 drop-shadow-lg" />
         <h1 className="text-4xl font-bold mb-2 text-gray-900">XGarden</h1>
-        <p className="text-gray-700">Choose your reality</p>
+        <p className="text-gray-700">{t('app.subtitle')}</p>
       </div>
 
       <div className="w-full max-w-xs space-y-4">
-        <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-2">
+        <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2">
           {worlds.map(world => (
             <button
               key={world}
@@ -153,14 +179,14 @@ export function WorldSelector() {
                 <button
                   onClick={(e) => handleExport(world, e)}
                   className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
-                  title="Export World"
+                  title={t('worldSelector.exportWorld')}
                 >
                   <Download size={16} />
                 </button>
                 <button
                   onClick={(e) => handleDelete(world, e)}
                   className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                  title="Delete World"
+                  title={t('worldSelector.deleteWorld')}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -177,7 +203,7 @@ export function WorldSelector() {
                 type="text"
                 value={newWorldName}
                 onChange={(e) => setNewWorldName(e.target.value)}
-                placeholder="New World Name"
+                placeholder={t('worldSelector.newWorldName')}
                 className="w-full px-4 py-3 rounded-xl border-none focus:ring-2 focus:ring-purple-500 bg-white/80 backdrop-blur-sm"
                 onKeyDown={(e) => e.key === 'Enter' && handleCreateWorld()}
               />
@@ -187,14 +213,14 @@ export function WorldSelector() {
               disabled={!newWorldName.trim()}
               className="px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg shadow-purple-500/30"
             >
-              Create
+              {t('worldSelector.create')}
             </button>
           </div>
           
           <div className="mt-4 flex flex-col gap-2">
             <label className="flex items-center justify-center gap-2 text-gray-700 hover:text-gray-900 cursor-pointer px-4 py-2 rounded-lg hover:bg-white/50 transition-colors">
               <Upload size={18} />
-              <span className="text-sm font-medium">Import World JSON</span>
+              <span className="text-sm font-medium">{t('worldSelector.importWorld')}</span>
               <input
                 type="file"
                 accept=".json"
@@ -207,7 +233,7 @@ export function WorldSelector() {
               className="flex items-center justify-center gap-2 text-purple-700 hover:text-purple-900 cursor-pointer px-4 py-2 rounded-lg hover:bg-purple-100/50 transition-colors"
             >
               <Sparkles size={18} />
-              <span className="text-sm font-medium">Load Example: CypherPink</span>
+              <span className="text-sm font-medium">{t('worldSelector.loadExample')}</span>
             </button>
           </div>
         </div>

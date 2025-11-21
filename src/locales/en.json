@@ -1,0 +1,46 @@
+{
+  "app": {
+    "title": "XGarden",
+    "subtitle": "Choose your reality"
+  },
+  "worldSelector": {
+    "openInNewTab": "Open in new tab",
+    "exportWorld": "Export World",
+    "deleteWorld": "Delete World",
+    "newWorldName": "New World Name",
+    "create": "Create",
+    "importWorld": "Import World JSON",
+    "loadExample": "Load Example: CypherPink"
+  },
+  "chat": {
+    "selectCharacter": "Select a Character",
+    "exitWorld": "Exit World",
+    "pauseMusic": "Pause Music",
+    "playMusic": "Play Music",
+    "worldSettings": "World Settings",
+    "thinking": "Thinking..."
+  },
+  "sidebar": {
+    "characters": "Characters",
+    "groups": "Groups",
+    "worldbook": "Worldbook",
+    "addEntry": "Add Entry",
+    "config": "Config",
+    "aiSettings": "AI Settings"
+  },
+  "dialogs": {
+    "settings": "Settings",
+    "aiConfig": "AI Config",
+    "imageApi": "Image API",
+    "provider": "Provider",
+    "apiKey": "API Key",
+    "apiUrl": "API URL",
+    "model": "Model",
+    "accessKeyId": "Access Key ID",
+    "secretAccessKey": "Secret Access Key",
+    "apiEndpoint": "API Endpoint",
+    "save": "Save",
+    "done": "Done",
+    "cancel": "Cancel"
+  }
+}

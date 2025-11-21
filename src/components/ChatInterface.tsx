@@ -315,7 +315,7 @@ export function ChatInterface() {
       />
       
       {/* Overlay for readability */}
-      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
+      <div className="absolute inset-0 bg-white/30 backdrop-blur-[0.5px]" />
 
       {/* Tachie (Character Portrait) Layer */}
       {tachieUrl && (
@@ -366,16 +366,19 @@ export function ChatInterface() {
               <h1 className="font-bold text-gray-800">
                 {activeCharacter?.name || activeGroup?.name || 'Select a Character'}
               </h1>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 {activeGroup && (
                   <span className="text-xs text-gray-600">
                     {characters.filter(c => activeGroup.characterIds.includes(c.id!)).map(c => c.name).join(', ')}
                   </span>
                 )}
                 {activeChapter && (
-                  <span className="text-xs text-purple-600 font-medium px-2 py-0.5 bg-purple-50 rounded-full border border-purple-100">
-                    {activeChapter.title}
-                  </span>
+                  <div className="flex items-center gap-1 text-xs text-gray-700">
+                    <span className="font-medium">Chapter:</span>
+                    <span className="text-purple-600 font-medium px-2 py-0.5 bg-purple-50 rounded-full border border-purple-100">
+                      {activeChapter.title}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>

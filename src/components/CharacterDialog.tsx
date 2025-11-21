@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { dbService, Character } from '../services/database';
-import { X } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
 
 
 
@@ -107,6 +107,40 @@ export function CharacterDialog({ isOpen, onClose, onSave, initialData, onGenera
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-purple-500"
               placeholder="First message..."
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Avatar</label>
+            <div className="space-y-2">
+              {avatar && (
+                <div className="relative">
+                  <img
+                    src={avatar}
+                    alt="Avatar preview"
+                    className="w-24 h-24 rounded-lg object-cover border border-gray-300"
+                  />
+                </div>
+              )}
+              <label className="flex items-center justify-center gap-2 cursor-pointer px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
+                <Upload size={16} />
+                <span className="text-sm font-medium">Upload Avatar</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        setAvatar(event.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+            </div>
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">

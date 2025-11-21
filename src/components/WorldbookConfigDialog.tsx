@@ -192,6 +192,9 @@ export function WorldbookConfigDialog({ isOpen, onClose }: WorldbookConfigDialog
                         />
                       </label>
                     </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Recommended size: 1600×1200 or 1920×1440 (16:12 aspect ratio) for best clarity
+                    </p>
                     {worldDefaultBg && (
                       <img
                         src={worldDefaultBg}

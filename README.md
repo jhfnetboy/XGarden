@@ -66,23 +66,52 @@ An open-source Chrome extension for AI-driven character interactions, world-buil
 ![World Configuration](docs/screenshots/world-config1.png)
 *Configure world settings, backgrounds, and music*
 
-### Character Management
-![Character Creation](docs/screenshots/charactor-add.jpg)
-*Create and customize characters with avatars*
+![World Configuration - Chapters](docs/screenshots/world-config2.png)
+*Manage story chapters with backgrounds and triggers*
 
-### Chat Experience
+### Character Management
+![Character List](docs/screenshots/Charactor-talk.png)
+*Talk with diverse AI characters in immersive worlds*
+
+![Character Creation & Editing](docs/screenshots/Charactor-edit.png)
+*Create and customize characters with detailed settings and avatars*
+
+![Character Creation Dialog](docs/screenshots/charactor-add.jpg)
+*Add new characters with personality, greeting, and avatar*
+
+### Immersive Chat Experience
 ![Chat Interface - Spring World](docs/screenshots/chat1-Spring.jpg)
-*Immersive chat with background images and effects*
+*Experience immersive chat with beautiful backgrounds and effects*
 
 ![Chat Interface - CypherPink World](docs/screenshots/chat2-CyperPink.jpg)
-*Dynamic storytelling with chapter progression*
+*Dynamic storytelling with character interactions and chapter progression*
 
-### Full Application Views
+### Character Profiles
+![ZiWei Character](docs/screenshots/ZiWei.png)
+*Example character with detailed persona and backstory*
+
+![Boss Character](docs/screenshots/Boss.png)
+*Diverse character types for varied interactions*
+
+![Coach Character](docs/screenshots/Coach.png)
+*Create characters with different roles and personalities*
+
+### Relaxing Atmospheres
+![Sakura Background](docs/screenshots/Sakura.png)
+*Beautiful world environments with immersive backgrounds*
+
+![Puppy Companion](docs/screenshots/Puppy.png)
+*Craft unique worlds and characters for your stories*
+
+### Application Views
 ![Full Screen Chat](docs/screenshots/full-screen-chat.png)
-*Expanded chat view for full immersion*
+*Expanded chat view for maximum immersion*
+
+![Full Window Interface](docs/screenshots/full-window.png)
+*Complete interface showing all controls and options*
 
 ![Sidebar Navigation](docs/screenshots/left-bar.png)
-*Character and group management sidebar*
+*Character and group management with quick access*
 
 ---
 

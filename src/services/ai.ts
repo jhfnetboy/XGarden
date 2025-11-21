@@ -316,12 +316,29 @@ Make the conversation feel natural - characters can agree, disagree, ask questio
 
     // Stream response character by character with delay for typewriter effect
     let accumulatedText = '';
-    for (const char of fullResponse) {
+    for (let i = 0; i < fullResponse.length; i++) {
+      const char = fullResponse[i];
       accumulatedText += char;
       onChunk(accumulatedText);
-      // Add delay between characters for typewriter effect
-      // Using 50ms per character for a more natural typing speed
-      await new Promise(resolve => setTimeout(resolve, 50)); // 50ms per character
+
+      // Determine delay based on character type
+      let delay = 100; // 100ms per character for slower, more natural typing
+
+      // Sentence-ending punctuation: pause for 1-2 seconds (1000-1500ms)
+      const isSentenceEnd = char === '.' || char === '!' || char === '?' ||
+                           char === '。' || char === '！' || char === '？' ||
+                           char === '，' || char === '，'; // Chinese punctuation
+
+      if (isSentenceEnd) {
+        // Check if next character exists and is not a space/newline
+        const nextChar = i + 1 < fullResponse.length ? fullResponse[i + 1] : '';
+        if (nextChar && nextChar !== ' ' && nextChar !== '\n') {
+          // Pause after sentence end
+          delay = 1200; // 1.2 second pause
+        }
+      }
+
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
 
     return fullResponse;

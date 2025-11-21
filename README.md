@@ -1,39 +1,309 @@
-# XGarden
-Yeah, it is yet another(?) crypto game framework, that service for the Arcadia: Infinity Garden
+# XGarden - AI-Powered Interactive Storytelling Chrome Extension
 
-## Motivation
-We(CMUBA guys) want to create something running with a triangle: Community-->Game-->Business.
-So the crypto game with tokens can help us to build this circle.
-If you join a community with a game mode and contribute, get PNTs.
-You can also play games with all community members to earn more PNTs to get a community reputation or game gear.
-Or, you can use your PNTs to get gifts or giveaways from real business units or join activities in the real business to get PNTs.
+<div align="center">
 
-## Destination
-This repo will collect some Web3 SDK or repos to build a framework to help us build a Crypto game in one week!
-Haha, it is also a Hackathon toolkit for all!
-If you want to build a Crypto Game in a few days, try us and leave some feedback.
+**🌸 Create Your Own Interactive Story Worlds 🌸**
 
-Build a quick flow with some SDK and codings for the Web3 part of the Crypto Games.
-And you must finish the game's core part: story and run.
-This repo can help you to get a Crypto engine maybe.
+An open-source Chrome extension for AI-driven character interactions, world-building, and immersive storytelling.
 
-## Basic Idea
-What is the most interesting game?
-Chill
-AI
-Easy
-Story
-Interaction
-Friends
-Tales
-Real Mirror World
-PNTs
-Mobile version
+[![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)](https://github.com/jhfnetboy/InfinityGarden/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
+[English](README.md) | [中文](README_CN.md)
 
-## Architecture
+[Features](#features) • [Installation](#installation) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Roadmap](#roadmap)
 
+</div>
 
-### AI
-1. Set AI with Gemini （Google AI Studio）
-2. Set Image Generation AI API with Jimeng：https://console.volcengine.com/ai/ability/detail/2
+---
+
+## ✨ Features
+
+### 🎭 Character & World Management
+- **Create Custom Characters**: Design unique NPCs with personalities, greetings, and avatars
+- **Player Character**: Set your own character with custom personality traits
+- **Group Conversations**: Organize characters into groups for multi-character interactions
+- **World Building**: Define world settings, backgrounds, and lore with keyword-based worldbook entries
+
+### 📖 Chapter System
+- **Dynamic Chapters**: Create story chapters with custom backgrounds and music
+- **Auto-Progression**: Chapters advance based on:
+  - Time/dialogue count
+  - Keyword triggers
+  - AI-driven story judgment
+- **Chapter-Specific Media**: Each chapter can have unique background images and music
+
+### 🎨 Immersive Experience
+- **Background Images**: World defaults + chapter-specific backgrounds
+- **Background Music**: Atmospheric audio that changes with chapters
+- **Visual Effects**: Semi-transparent overlays for readability
+
+### 🤖 AI Integration
+- **Google Gemini**: Free API via Google AI Studio (recommended)
+- **OpenAI Compatible**: Support for OpenAI and compatible APIs
+- **Image Generation**: Jimeng (Volcengine) API for character avatars and scene illustrations *(in development)*
+
+### 💾 Data Management
+- **Multiple Worlds**: Create and switch between different story worlds
+- **Import/Export**: Share worlds as JSON files
+- **Local Storage**: All data stored locally in IndexedDB
+
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/jhfnetboy/InfinityGarden.git
+   cd InfinityGarden
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Build the extension**
+   ```bash
+   pnpm run build
+   ```
+
+4. **Load in Chrome**
+   - Open `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select the `dist` folder
+
+### First-Time Setup
+
+1. **Get a Free API Key**
+   - Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+   - Create a free Gemini API key
+
+2. **Configure XGarden**
+   - Click the XGarden extension icon
+   - Go to Settings → AI Config
+   - Enter your Gemini API key
+   - Select your preferred model (e.g., `gemini-2.0-flash`)
+
+3. **Create Your First World**
+   - Click "Create New World"
+   - Add characters, define the world setting
+   - Start chatting!
+
+---
+
+## 📚 Documentation
+
+### World Setup
+
+#### 1. World Defaults (Worldbook → Entries)
+- **World Description**: Overall setting and theme
+- **Default Background**: Image shown when no chapter is active
+- **Default Music**: Ambient music for the world
+
+#### 2. Characters
+- **Name**: Character identifier
+- **Persona**: Personality description for AI
+- **Greeting**: First message
+- **Player Character**: Mark one character as yourself
+
+#### 3. Worldbook Entries
+- **Keywords**: Trigger words (e.g., "magic system", "The Great War")
+- **Content**: Lore and context injected when keywords appear
+
+#### 4. Chapters (Worldbook → Chapters)
+- **Order**: Chapter sequence
+- **Title & Description**: Chapter info
+- **Background Image/Music**: Chapter-specific media
+- **Trigger Type**:
+  - **Time**: Advance after N dialogues or minutes
+  - **Keyword**: Advance when specific words appear
+  - **AI Judgment**: Let AI decide when to progress
+
+### Image Generation API (Optional)
+
+For AI-generated character avatars and scene illustrations:
+
+1. **Get Jimeng API Keys**
+   - Visit [Volcengine Console](https://console.volcengine.com/ai/ability/detail/2)
+   - Get Access Key ID and Secret Access Key
+
+2. **Configure in Settings**
+   - Settings → Image API
+   - Enter your credentials
+   - [Documentation](https://www.volcengine.com/docs/85621/1817045)
+
+---
+
+## 🎵 Adding Background Music
+
+Music files should be placed in `public/assets/music/`:
+- `peaceful-forest.mp3`
+- `calm-piano.mp3`
+- `ambient-space.mp3`
+- `medieval-lute.mp3`
+- `gentle-rain.mp3`
+
+**Free Music Resources**:
+- [Pixabay Music](https://pixabay.com/music/)
+- [Free Music Archive](https://freemusicarchive.org/)
+- [Incompetech](https://incompetech.com/music/royalty-free/)
+
+Alternatively, modify `getMusicUrl()` in `ChatInterface.tsx` to use online URLs.
+
+---
+
+## 🛠️ Development
+
+### Tech Stack
+- **React** + **TypeScript**
+- **Vite** - Build tool
+- **IndexedDB** (via `idb`) - Local storage
+- **LangChain** - AI integration
+- **TailwindCSS** - Styling
+
+### Project Structure
+```
+src/
+├── components/          # React components
+│   ├── ChatInterface.tsx
+│   ├── WorldSelector.tsx
+│   ├── Sidebar.tsx
+│   └── ...
+├── services/           # Core services
+│   ├── database.ts     # IndexedDB operations
+│   ├── ai.ts          # AI service
+│   ├── globalConfig.ts # Settings
+│   └── vector-db.ts   # Vector search (RAG)
+└── App.tsx            # Main app
+```
+
+### Build Commands
+```bash
+pnpm run dev    # Development mode
+pnpm run build  # Production build
+pnpm run preview # Preview build
+```
+
+---
+
+## 🗺️ Roadmap
+
+### v0.1.3 (Current) ✅
+- ✅ World default backgrounds and music
+- ✅ Chapter system with auto-progression
+- ✅ Character and group management
+- ✅ Worldbook entries
+- ✅ Image API configuration (Jimeng)
+
+### v0.2.0 (Next Release)
+- 🔄 AI image generation integration
+  - Character avatar generation
+  - Scene illustration generation
+  - Dynamic visual storytelling
+- 🔄 Enhanced RAG with vector embeddings
+- 🔄 Performance optimizations
+
+### v0.3.0 - Historical & Literary Worlds
+- 📚 **Pre-built World Templates**
+  - Romance of the Three Kingdoms (三国演义)
+  - Journey to the West (西游记)
+  - The Three Musketeers
+  - Greek Mythology
+  - Norse Mythology
+  - And more classic literature worlds
+- 🎭 **Historical Characters Integration**
+  - Interact with historical figures in their contexts
+  - Accurate historical backgrounds and settings
+  - Educational storytelling experiences
+
+### v0.4.0 - Famous Personalities Database
+- 🧑‍🔬 **Scientists & Innovators**
+  - Alan Turing (Computer Science Pioneer)
+  - Claude Shannon (Information Theory Founder)
+  - Albert Einstein (Theoretical Physicist)
+  - Isaac Newton (Mathematician & Physicist)
+  - Marie Curie (Physicist & Chemist)
+  - And many more...
+- 💭 **Philosophers & Thinkers**
+  - Socrates, Plato, Aristotle
+  - Confucius, Laozi
+  - Modern philosophers
+- 💼 **Economists & Psychologists**
+  - Adam Smith, John Maynard Keynes
+  - Sigmund Freud, Carl Jung
+  - Contemporary thought leaders
+- 🎨 **Artists & Writers**
+  - Shakespeare, Tolstoy, Hemingway
+  - Da Vinci, Van Gogh, Picasso
+  - And more cultural icons
+
+### v0.5.0 - Open Gaming Platform
+- 🎮 **Community Features**
+  - Share custom worlds and characters
+  - Community-created content library
+  - Rating and review system
+- 🌐 **Multiplayer Interactions**
+  - Shared world experiences
+  - Collaborative storytelling
+  - Real-time character interactions
+- 🏆 **Gamification**
+  - Achievement system
+  - Story progression tracking
+  - Community challenges
+
+### Future Vision
+- 🎬 Video generation for cinematic storytelling
+- 🎙️ Voice synthesis for character dialogues
+- 🌳 Branching storylines with choice consequences
+- 🔗 Blockchain integration for NFT characters/worlds
+- 📱 Mobile companion app
+- 🌍 Multi-language support (Chinese, English, Japanese, etc.)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Google Gemini** for free AI API access
+- **Volcengine Jimeng** for image generation capabilities
+- **LangChain** for AI integration framework
+- **Open-source AI training datasets** for historical character data
+- All open-source contributors and community members
+
+---
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/jhfnetboy/InfinityGarden/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/jhfnetboy/InfinityGarden/discussions)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the XGarden Team**
+
+⭐ Star us on GitHub if you find this project useful!
+
+</div>

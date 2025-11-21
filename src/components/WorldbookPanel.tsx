@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { dbService } from '../services/database';
-import { X } from 'lucide-react';
+import { dbService, Worldbook, Chapter } from '../services/database';
+import { X, Plus, Edit2, Trash2, Play, Book, FileText } from 'lucide-react';
+import { WorldbookDialog } from './WorldbookDialog';
+import { ChapterDialog } from './ChapterDialog';
 
 interface WorldbookPanelProps {
   isOpen: boolean;
@@ -8,11 +10,24 @@ interface WorldbookPanelProps {
 }
 
 export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
+  const [activeTab, setActiveTab] = useState<'entries' | 'chapters'>('entries');
   const [worldDescription, setWorldDescription] = useState('');
+  
+  // Entries state
+  const [worldbooks, setWorldbooks] = useState<Worldbook[]>([]);
+  const [isWorldbookDialogOpen, setIsWorldbookDialogOpen] = useState(false);
+  const [editingWorldbook, setEditingWorldbook] = useState<Worldbook | undefined>(undefined);
+  
+  // Chapters state
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [isChapterDialogOpen, setIsChapterDialogOpen] = useState(false);
+  const [editingChapter, setEditingChapter] = useState<Chapter | undefined>(undefined);
 
   useEffect(() => {
     if (isOpen) {
       loadDescription();
+      loadWorldbooks();
+      loadChapters();
     }
   }, [isOpen]);
 
@@ -21,9 +36,24 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
     setWorldDescription(desc);
   }
 
-  async function handleSave() {
+  async function loadWorldbooks() {
+    const wbs = await dbService.getAllWorldbooks();
+    setWorldbooks(wbs);
+  }
+
+  async function loadChapters() {
+    const allChapters = await dbService.getAllChapters();
+    allChapters.sort((a, b) => a.order - b.order);
+    setChapters(allChapters);
+  }
+
+  async function handleSaveDescription() {
     await dbService.saveWorldDescription(worldDescription);
-    onClose();
+  }
+
+  async function handleSetActive(chapter: Chapter) {
+    await dbService.saveChapter({ ...chapter, isActive: true });
+    loadChapters();
   }
 
   if (!isOpen) return null;
@@ -31,44 +61,235 @@ export function WorldbookPanel({ isOpen, onClose }: WorldbookPanelProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-end z-50" onClick={onClose}>
       <div 
-        className="bg-white h-full w-96 shadow-2xl flex flex-col animate-slide-in-right"
+        className="bg-white h-full w-[500px] shadow-2xl flex flex-col animate-slide-in-right"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h2 className="text-lg font-bold text-gray-800">Worldbook Settings</h2>
+          <h2 className="text-lg font-bold text-gray-800">Worldbook</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X size={20} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              World Description
-            </label>
-            <textarea
-              value={worldDescription}
-              onChange={(e) => setWorldDescription(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-purple-500 h-48 resize-none"
-              placeholder="Describe the world setting, background, theme, and atmosphere..."
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              This description helps AI understand the world context for better roleplay and storytelling.
-            </p>
-          </div>
-
-          {/* Future: Add more worldbook settings here */}
-        </div>
-
-        <div className="p-6 border-t border-gray-200">
+        {/* Tabs */}
+        <div className="flex gap-2 px-6 pt-4 border-b border-gray-200">
           <button
-            onClick={handleSave}
-            className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 font-medium"
+            onClick={() => setActiveTab('entries')}
+            className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
+              activeTab === 'entries'
+                ? 'text-purple-600 border-b-2 border-purple-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
           >
-            Save Settings
+            <FileText size={16} />
+            Entries ({worldbooks.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('chapters')}
+            className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
+              activeTab === 'chapters'
+                ? 'text-purple-600 border-b-2 border-purple-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <Book size={16} />
+            Chapters ({chapters.length})
           </button>
         </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {activeTab === 'entries' ? (
+            <>
+              {/* World Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  World Description
+                </label>
+                <textarea
+                  value={worldDescription}
+                  onChange={(e) => setWorldDescription(e.target.value)}
+                  onBlur={handleSaveDescription}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-purple-500 h-32 resize-none text-sm"
+                  placeholder="Describe the world setting, background, theme..."
+                />
+              </div>
+
+              {/* Entries List */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-sm font-semibold text-gray-700">Keyword Entries</h3>
+                  <button
+                    onClick={() => {
+                      setEditingWorldbook(undefined);
+                      setIsWorldbookDialogOpen(true);
+                    }}
+                    className="px-3 py-1 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm flex items-center gap-1"
+                  >
+                    <Plus size={14} />
+                    Add Entry
+                  </button>
+                </div>
+
+                {worldbooks.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 text-sm">
+                    <p>No entries yet. Add keyword-based lore!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {worldbooks.map((wb) => (
+                      <div
+                        key={wb.id}
+                        className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors group"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-purple-600 truncate">
+                                {wb.keywords}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600 line-clamp-2">{wb.content}</p>
+                          </div>
+                          <div className="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => {
+                                setEditingWorldbook(wb);
+                                setIsWorldbookDialogOpen(true);
+                              }}
+                              className="p-1 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded"
+                              title="Edit"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm(`Delete entry "${wb.keywords}"?`)) {
+                                  await dbService.deleteWorldbook(wb.id!);
+                                  loadWorldbooks();
+                                }
+                              }}
+                              className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Chapters List */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-sm font-semibold text-gray-700">Story Chapters</h3>
+                  <button
+                    onClick={() => {
+                      setEditingChapter(undefined);
+                      setIsChapterDialogOpen(true);
+                    }}
+                    className="px-3 py-1 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm flex items-center gap-1"
+                  >
+                    <Plus size={14} />
+                    Add Chapter
+                  </button>
+                </div>
+
+                {chapters.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 text-sm">
+                    <p>No chapters yet. Create your first chapter!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {chapters.map((chapter) => (
+                      <div
+                        key={chapter.id}
+                        className={`p-3 rounded-lg border-2 transition-colors ${
+                          chapter.isActive
+                            ? 'border-purple-500 bg-purple-50'
+                            : chapter.isCompleted
+                            ? 'border-gray-300 bg-gray-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-gray-500">Ch. {chapter.order}</span>
+                              <h4 className="font-semibold text-sm text-gray-800 truncate">{chapter.title}</h4>
+                              {chapter.isActive && (
+                                <span className="px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">Active</span>
+                              )}
+                              {chapter.isCompleted && (
+                                <span className="px-2 py-0.5 bg-gray-400 text-white text-xs rounded-full">Done</span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-600 line-clamp-2">{chapter.description}</p>
+                            <div className="flex gap-2 mt-1 text-xs text-gray-500">
+                              <span>Trigger: {chapter.triggerType}</span>
+                            </div>
+                          </div>
+                          <div className="flex gap-1 ml-2">
+                            {!chapter.isActive && !chapter.isCompleted && (
+                              <button
+                                onClick={() => handleSetActive(chapter)}
+                                className="p-1 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded"
+                                title="Set as Active"
+                              >
+                                <Play size={14} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => {
+                                setEditingChapter(chapter);
+                                setIsChapterDialogOpen(true);
+                              }}
+                              className="p-1 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded"
+                              title="Edit"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm(`Delete chapter "${chapter.title}"?`)) {
+                                  await dbService.deleteChapter(chapter.id!);
+                                  loadChapters();
+                                }
+                              }}
+                              className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
+
+      <WorldbookDialog
+        isOpen={isWorldbookDialogOpen}
+        onClose={() => setIsWorldbookDialogOpen(false)}
+        onSave={loadWorldbooks}
+        initialData={editingWorldbook}
+      />
+
+      <ChapterDialog
+        isOpen={isChapterDialogOpen}
+        onClose={() => setIsChapterDialogOpen(false)}
+        onSave={loadChapters}
+        initialData={editingChapter}
+      />
     </div>
   );
 }

@@ -58,8 +58,11 @@ export function GroupDialog({ isOpen, onClose, onSave, initialData }: GroupDialo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-96 max-h-[80vh] flex flex-col p-6 shadow-xl">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div 
+        className="bg-white rounded-xl w-96 max-h-[80vh] flex flex-col p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-gray-800">
             {initialData ? 'Edit Group' : 'New Group'}

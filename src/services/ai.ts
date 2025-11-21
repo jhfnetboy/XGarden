@@ -319,8 +319,9 @@ Make the conversation feel natural - characters can agree, disagree, ask questio
     for (const char of fullResponse) {
       accumulatedText += char;
       onChunk(accumulatedText);
-      // Add small delay between characters for typewriter effect
-      await new Promise(resolve => setTimeout(resolve, 20)); // 20ms per character
+      // Add delay between characters for typewriter effect
+      // Using 50ms per character for a more natural typing speed
+      await new Promise(resolve => setTimeout(resolve, 50)); // 50ms per character
     }
 
     return fullResponse;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 // import { useNavigate } from 'react-router-dom';
-import { Send, Menu, MoreVertical, Volume2, VolumeX, LogOut, Settings } from 'lucide-react';
+import { Send, Menu, MoreVertical, Volume2, VolumeX, LogOut, Settings, Zap, ZapOff } from 'lucide-react';
 import { aiService } from '../services/ai';
 import { dbService as databaseService, Message, Character, Chapter, Group, WorldDefaults } from '../services/database';
 import { i18nService, Language } from '../services/i18n';
@@ -24,6 +24,7 @@ export function ChatInterface() {
   const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
   const [worldDefaults, setWorldDefaults] = useState<WorldDefaults>({});
   const [isMusicPlaying, setIsMusicPlaying] = useState(true);
+  const [isTypewriterSoundEnabled, setIsTypewriterSoundEnabled] = useState(true);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(i18nService.getLanguage());
 
   // Monitor language changes
@@ -513,14 +514,16 @@ export function ChatInterface() {
                     className="prose prose-sm max-w-none dark:prose-invert"
                     onClick={() => {
                       // Play sound when message is clicked (for testing)
-                      typewriterSound.playBeep();
+                      if (isTypewriterSoundEnabled) {
+                        typewriterSound.playBeep();
+                      }
                     }}
                   >
                     <ReactMarkdown
                       components={{
                         p: ({ children }) => {
                           // Play a beep when paragraph is rendered (character-by-character effect)
-                          if (typeof children === 'string' && children.length > 0) {
+                          if (isTypewriterSoundEnabled && typeof children === 'string' && children.length > 0) {
                             // Play sound with probability based on text length
                             const probability = Math.min(0.3, 0.02 * children.length);
                             if (Math.random() < probability) {
@@ -558,7 +561,18 @@ export function ChatInterface() {
 
         {/* Input Area */}
         <div className="p-4 bg-white/30 backdrop-blur-md">
-          <div className="flex gap-2 max-w-4xl mx-auto">
+          <div className="flex gap-2 max-w-4xl mx-auto items-center">
+            <button
+              onClick={() => setIsTypewriterSoundEnabled(!isTypewriterSoundEnabled)}
+              className={`p-2 rounded-full transition-colors flex-shrink-0 ${
+                isTypewriterSoundEnabled
+                  ? 'text-purple-600 hover:bg-purple-50'
+                  : 'text-gray-400 hover:bg-gray-100'
+              }`}
+              title={isTypewriterSoundEnabled ? 'Typewriter sound on' : 'Typewriter sound off'}
+            >
+              {isTypewriterSoundEnabled ? <Zap size={18} /> : <ZapOff size={18} />}
+            </button>
             <input
               type="text"
               value={input}
@@ -571,7 +585,7 @@ export function ChatInterface() {
             <button
               onClick={handleSend}
               disabled={(!activeCharacter && !activeGroupId) || isLoading || !input.trim()}
-              className="bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

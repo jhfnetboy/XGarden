@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XGarden - AI-Powered Interactive Storytelling</title>
+    <meta name="description" content="Create interactive story worlds with AI characters. Free Chrome extension for immersive storytelling and world-building.">
+    <meta name="keywords" content="AI, storytelling, interactive fiction, Chrome extension, world-building">
+    <meta property="og:title" content="XGarden - AI-Powered Interactive Storytelling">
+    <meta property="og:description" content="Create your own interactive story worlds with AI-driven characters">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jhfnetboy.github.io/XGarden/">
     <style>
         * {
             margin: 0;
@@ -212,42 +218,25 @@
             line-height: 1.5;
         }
 
-        /* Screenshots Section */
-        .screenshots {
+        /* CTA Section */
+        .cta-section {
             padding: 4rem 0;
-            background: #fafafa;
-        }
-
-        .screenshot-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .screenshot {
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            aspect-ratio: 1;
-            background: var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-light);
+            background: var(--gradient);
+            color: white;
             text-align: center;
-            padding: 2rem;
+            border-radius: 1rem;
+            margin: 4rem 0;
         }
 
-        .screenshot:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
         }
 
-        .screenshot img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .cta-section p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
         }
 
         /* Install Section */
@@ -286,7 +275,7 @@
             color: var(--text);
         }
 
-        .install ol {
+        .install ol, .install ul {
             margin-left: 1.5rem;
             color: var(--text-light);
         }
@@ -295,25 +284,14 @@
             margin-bottom: 1rem;
         }
 
-        /* CTA Section */
-        .cta-section {
-            padding: 4rem 0;
-            background: var(--gradient);
-            color: white;
-            text-align: center;
-            border-radius: 1rem;
-            margin: 4rem 0;
+        .install a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
         }
 
-        .cta-section h2 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .cta-section p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+        .install a:hover {
+            text-decoration: underline;
         }
 
         /* Footer */
@@ -338,6 +316,10 @@
 
         .footer-section ul {
             list-style: none;
+        }
+
+        .footer-section p {
+            color: #d1d5db;
         }
 
         .footer-section a {
@@ -411,19 +393,15 @@
 
         .feature-card {
             animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
         }
 
-        .feature-card:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .feature-card:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .feature-card:nth-child(4) {
-            animation-delay: 0.3s;
-        }
+        .feature-card:nth-child(1) { animation-delay: 0s; }
+        .feature-card:nth-child(2) { animation-delay: 0.1s; }
+        .feature-card:nth-child(3) { animation-delay: 0.2s; }
+        .feature-card:nth-child(4) { animation-delay: 0.1s; }
+        .feature-card:nth-child(5) { animation-delay: 0.2s; }
+        .feature-card:nth-child(6) { animation-delay: 0.3s; }
     </style>
 </head>
 <body>
@@ -442,7 +420,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>Create Your Own Interactive Story Worlds</h1>
+            <h1>🌸 Create Your Own Interactive Story Worlds</h1>
             <p class="subtitle">An open-source Chrome extension for AI-driven character interactions, world-building, and immersive storytelling</p>
             <div class="cta-buttons">
                 <a href="https://github.com/jhfnetboy/XGarden" class="btn btn-primary">View on GitHub</a>
@@ -506,10 +484,10 @@
                 <h2 class="section-title">🚀 Quick Start</h2>
 
                 <h3>1. Prerequisites</h3>
-                <p>You'll need a free API key from:</p>
+                <p>You'll need a free API key from one of these services:</p>
                 <ul>
-                    <li><strong>Google Gemini</strong> (recommended): <a href="https://aistudio.google.com/app/apikey" target="_blank">Get API Key</a></li>
-                    <li><strong>OpenAI</strong>: <a href="https://platform.openai.com/api-keys" target="_blank">Get API Key</a></li>
+                    <li><strong>Google Gemini</strong> (recommended): <a href="https://aistudio.google.com/app/apikey" target="_blank">Get Free API Key →</a></li>
+                    <li><strong>OpenAI</strong>: <a href="https://platform.openai.com/api-keys" target="_blank">Get API Key →</a></li>
                 </ul>
 
                 <h3>2. Installation Steps</h3>
@@ -518,7 +496,7 @@
                         <div class="code-block"><code>git clone https://github.com/jhfnetboy/XGarden.git
 cd XGarden</code></div>
                     </li>
-                    <li>Install dependencies:
+                    <li>Install dependencies (requires <a href="https://pnpm.io/installation" target="_blank">pnpm</a>):
                         <div class="code-block"><code>pnpm install</code></div>
                     </li>
                     <li>Build the extension:
@@ -526,21 +504,28 @@ cd XGarden</code></div>
                     </li>
                     <li>Load in Chrome:
                         <ul style="margin: 1rem 0 0 1.5rem;">
-                            <li>Open <code style="background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 0.25rem;">chrome://extensions/</code></li>
-                            <li>Enable "Developer mode"</li>
+                            <li>Open <code style="background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 0.25rem; color: #d97706;">chrome://extensions/</code></li>
+                            <li>Enable "Developer mode" (top right)</li>
                             <li>Click "Load unpacked"</li>
-                            <li>Select the <code style="background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 0.25rem;">dist</code> folder</li>
+                            <li>Select the <code style="background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 0.25rem; color: #d97706;">dist</code> folder</li>
                         </ul>
                     </li>
-                    <li>Configure your API key in XGarden Settings</li>
                 </ol>
 
-                <h3>3. Create Your First World</h3>
+                <h3>3. First Time Setup</h3>
                 <ol>
-                    <li>Click the XGarden extension icon</li>
-                    <li>Click "Create New World"</li>
-                    <li>Add characters and define the world setting</li>
-                    <li>Start chatting with AI-powered characters!</li>
+                    <li>Click the XGarden extension icon in Chrome</li>
+                    <li>Go to Settings → AI Config</li>
+                    <li>Enter your API key and select your preferred model</li>
+                    <li>Click "Create New World" and start building!</li>
+                </ol>
+
+                <h3>4. Create Your First World</h3>
+                <ol>
+                    <li>Name your world and set a description</li>
+                    <li>Add characters with unique personas</li>
+                    <li>Configure background images and music</li>
+                    <li>Start chatting with your AI characters!</li>
                 </ol>
             </div>
         </div>
@@ -554,32 +539,32 @@ cd XGarden</code></div>
                 <div class="feature-card" style="background: var(--background);">
                     <div class="feature-icon">⚛️</div>
                     <h3>React + TypeScript</h3>
-                    <p>Modern, type-safe UI framework for building interactive components</p>
+                    <p>Modern, type-safe UI framework with functional components</p>
                 </div>
                 <div class="feature-card" style="background: var(--background);">
                     <div class="feature-icon">📦</div>
-                    <h3>Vite + Chrome Extension MV3</h3>
+                    <h3>Vite + MV3</h3>
                     <p>Fast build tool and modern Chrome extension manifest</p>
                 </div>
                 <div class="feature-card" style="background: var(--background);">
                     <div class="feature-icon">🗄️</div>
                     <h3>IndexedDB</h3>
-                    <p>Local database for storing worlds, characters, and chat history</p>
+                    <p>Browser-based database for local world and character storage</p>
                 </div>
                 <div class="feature-card" style="background: var(--background);">
                     <div class="feature-icon">🔗</div>
                     <h3>LangChain</h3>
-                    <p>AI integration framework for seamless model integration</p>
+                    <p>AI integration framework for multiple LLM providers</p>
                 </div>
                 <div class="feature-card" style="background: var(--background);">
                     <div class="feature-icon">🎨</div>
                     <h3>TailwindCSS</h3>
-                    <p>Utility-first CSS framework for beautiful styling</p>
+                    <p>Utility-first CSS for beautiful, responsive design</p>
                 </div>
                 <div class="feature-card" style="background: var(--background);">
                     <div class="feature-icon">🌍</div>
                     <h3>Multi-Language</h3>
-                    <p>Support for English, Chinese (Simplified), and Thai</p>
+                    <p>English, Chinese (Simplified), and Thai UI support</p>
                 </div>
             </div>
         </div>
@@ -590,29 +575,32 @@ cd XGarden</code></div>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>About</h4>
-                    <p>XGarden is an open-source Chrome extension for AI-powered interactive storytelling and world-building.</p>
+                    <h4>🌸 About XGarden</h4>
+                    <p>An open-source Chrome extension for AI-powered interactive storytelling. Create immersive worlds, build AI characters, and experience dynamic storytelling powered by modern language models.</p>
                 </div>
                 <div class="footer-section">
-                    <h4>Links</h4>
+                    <h4>🔗 Quick Links</h4>
                     <ul>
                         <li><a href="https://github.com/jhfnetboy/XGarden" target="_blank">GitHub Repository</a></li>
                         <li><a href="https://github.com/jhfnetboy/XGarden/issues" target="_blank">Report Issues</a></li>
                         <li><a href="https://github.com/jhfnetboy/XGarden/discussions" target="_blank">Discussions</a></li>
+                        <li><a href="https://github.com/jhfnetboy/XGarden/releases" target="_blank">Releases</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Resources</h4>
+                    <h4>📚 Resources</h4>
                     <ul>
-                        <li><a href="https://aistudio.google.com/app/apikey" target="_blank">Gemini API</a></li>
-                        <li><a href="https://platform.openai.com" target="_blank">OpenAI API</a></li>
+                        <li><a href="https://aistudio.google.com/app/apikey" target="_blank">Google Gemini API</a></li>
+                        <li><a href="https://platform.openai.com" target="_blank">OpenAI Platform</a></li>
                         <li><a href="https://langchain.com" target="_blank">LangChain</a></li>
+                        <li><a href="https://pnpm.io" target="_blank">pnpm Package Manager</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 XGarden. Licensed under MIT License.</p>
+                <p>&copy; 2024 XGarden. Open-sourced under the MIT License.</p>
                 <p>Made with ❤️ by the XGarden Team</p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">Inspired by <a href="https://github.com/SillyTavern/SillyTavern" target="_blank">SillyTavern</a> and <a href="https://github.com/34892002/3000World" target="_blank">3000World</a></p>
             </div>
         </div>
     </footer>

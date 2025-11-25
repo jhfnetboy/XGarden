@@ -14,9 +14,8 @@ const manifestWithContentScript: ManifestV3Export = {
   ],
   permissions: [
     "storage",
-    "identity",
-    "tabs",
-    // "scripting" is no longer needed as we are not injecting programmatically
+    // Note: chrome.tabs.create() does not require "tabs" permission
+    // Only accessing tab properties like url/title requires the permission
   ],
 };
 
